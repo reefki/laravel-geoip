@@ -1,0 +1,46 @@
+{
+    "name": "reefki/laravel-geoip",
+    "description": "A Laravel package to get IP addresses geographical location.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rifki Aria Gumelar",
+            "email": "rifki@rifki.net"
+        }
+    ],
+    "require": {
+        "illuminate/http": "^9.0|^10.0",
+        "illuminate/support": "^9.0|^10.0",
+        "eventsauce/object-hydrator": "^1.4",
+        "guzzlehttp/guzzle": "^7.0",
+        "symfony/http-foundation": "^6.3"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^7.0|^8.0",
+        "phpunit/phpunit": "^10.0",
+        "laravel/pint": "^1.13",
+        "phpstan/phpstan": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Reefki\\Geoip\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Reefki\\Geoip\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Reefki\\Geoip\\GeoipServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "ftest": "vendor/bin/phpunit --filter"
+    }
+}
