@@ -35,4 +35,24 @@ class GeoipTest extends TestCase
 
         $this->assertFalse($geoip->cached);
     }
+
+    /** @test */
+    public function it_can_get_ip_information_using_geojs_driver()
+    {
+        $ip = '8.8.8.8';
+        $geoip = Geoip::driver('geojs')->get($ip);
+
+        $this->assertInstanceOf(GeoipData::class, $geoip);
+    }
+
+    /** @test */
+    public function it_can_get_ip_information_using_ip_data_driver()
+    {
+        config()->set('geoip.services.ip-data.key', '384bfdd9bdb9ef8eead5e8218396c1d058284b1bc6c09bf22af3d3d2');
+
+        $ip = '8.8.8.8';
+        $geoip = Geoip::driver('ip-data')->get($ip);
+
+        $this->assertInstanceOf(GeoipData::class, $geoip);
+    }
 }

@@ -30,6 +30,8 @@ abstract class Driver
      */
     public function get(string $ipAddress, bool $cache = true): GeoipData
     {
+        $driver = $this->getDriverName();
+
         if (!$cache) {
             $data = $this->lookup($ipAddress);
             $cached = false;
@@ -42,8 +44,14 @@ abstract class Driver
             $cached = !is_null($data);
         }
 
+        $defaults = [
+            'ip' => $ipAddress,
+            'driver' => $driver,
+            'cached' => $cached,
+        ];
+
         return GeoipData::make(
-            $data ? [...$data, ...['cached' => $cached]] : ['ip' => $ipAddress, 'cached' => false]
+            $data ? [...$defaults, ...$data] : $defaults
         );
     }
 
@@ -54,4 +62,17 @@ abstract class Driver
      * @return array<string, mixed>|null
      */
     abstract public function lookup(string $ipAddress): ?array;
+
+    /**
+     * Get driver name.
+     *
+     * @return string
+     */
+    protected function getDriverName(): string
+    {
+        return str(class_basename(static::class))
+            ->snake()
+            ->replaceLast('_driver', '')
+            ->slug('-');
+    }
 }

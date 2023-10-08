@@ -21,6 +21,7 @@ class GeoipData
      * @param  float|null  $longitude
      */
     public function __construct(
+        public readonly ?string $driver = null,
         public readonly string $ip,
         public readonly ?string $city = null,
         public readonly ?string $region = null,
