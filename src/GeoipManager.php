@@ -16,7 +16,7 @@ class GeoipManager extends Manager
      */
     public function getDefaultDriver(): string
     {
-        return 'geojs';
+        return $this->config->get('geoip.default', 'geojs');
     }
 
     /**

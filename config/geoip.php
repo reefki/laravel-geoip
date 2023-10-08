@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'default' => env('GEOIP_DEFAULT_DRIVER', 'geojs'),
     'cache_store' => env('GEOIP_CACHE_STORE'),
     'cache_ttl' => env('GEOIP_CACHE_TTL', 60 * 60 * 24),
     'services' => [
