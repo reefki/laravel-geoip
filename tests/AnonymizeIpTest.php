@@ -3,10 +3,11 @@
 namespace Reefki\Geoip\Tests;
 
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Attributes\Test;
 
 class AnonymizeIpTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_anonymize_ipv4()
     {
         $request = Request::create('/');
@@ -15,7 +16,7 @@ class AnonymizeIpTest extends TestCase
         $this->assertEquals($request->anonymizedIp(), '8.8.8.0');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_anonymize_ipv6()
     {
         $request = Request::create('/');
