@@ -5,20 +5,25 @@ namespace Reefki\Geoip\Driver;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class IpDataDriver extends Driver
 {
     /**
-     * @inheritdoc
+     * Lookup the geoip information for the given IP address.
+     *
+     * @param  string  $ipAddress
+     * @return array<string, mixed>|null
      */
     public function lookup(string $ipAddress): ?array
     {
+        /** @var Response $response */
         $response = $this->request()->get(
             url: $ipAddress,
         );
 
-        if (!$response->ok()) {
+        if (! $response->ok()) {
             return null;
         }
 
@@ -38,20 +43,32 @@ class IpDataDriver extends Driver
     }
 
     /**
-     * Create aa new HTTP request for GeoJS API.
+     * Create a new HTTP request for the IPData API.
      *
-     * @return PendingRequest The configured HTTP request.
+     * @return \Illuminate\Http\Client\PendingRequest
      */
     protected function request(): PendingRequest
     {
-        return Http::baseUrl($this->config['url'])
+        /** @var string $url */
+        $url = $this->config['url'];
+
+        /** @var string $key */
+        $key = $this->config['key'];
+
+        return Http::baseUrl($url)
+            ->timeout($this->timeout)
             ->withQueryParameters([
-                'api-key' => $this->config['key'],
+                'api-key' => $key,
             ])
             ->accept('application/json')
             ->when(
-                value: $this->config['retry'],
-                callback: fn (PendingRequest $request, int $retry) => $request->retry($retry, 100, fn (Exception $exception) => $exception instanceof ConnectionException, false)
+                value: $this->retry,
+                callback: fn (PendingRequest $request, mixed $retryCount): PendingRequest => $request->retry(
+                    (int) $retryCount,
+                    100,
+                    fn (Exception $exception): bool => $exception instanceof ConnectionException,
+                    false
+                )
             );
     }
 }
