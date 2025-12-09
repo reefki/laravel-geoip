@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Laravel 11 and 12 support
 - PHP 8.2 and 8.3 support
+
 - Configurable HTTP timeout via `GEOIP_TIMEOUT` environment variable
 - Configurable retry count via `GEOIP_RETRY` environment variable
 - Support for non-taggable cache stores (file, database, array)
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Laravel 9 support (EOL since February 2024)
 - Per-driver `retry` configuration (use root-level `GEOIP_RETRY` instead)
 
 ## [1.0.0] - 2024-01-01

@@ -7,7 +7,7 @@ A Laravel package to get geographical location information from IP addresses.
 ## Requirements
 
 - PHP 8.1 or higher
-- Laravel 9, 10, 11, or 12
+- Laravel 10, 11, or 12
 
 ## Installation
 
