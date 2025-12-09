@@ -8,9 +8,10 @@ use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
 class GeoipData
 {
     /**
-     * Constructor for the GeoipData class.
+     * Create a new GeoipData instance.
      *
      * @param  string  $ip
+     * @param  string|null  $driver
      * @param  string|null  $city
      * @param  string|null  $region
      * @param  string|null  $country
@@ -19,10 +20,11 @@ class GeoipData
      * @param  string|null  $timezone
      * @param  float|null  $latitude
      * @param  float|null  $longitude
+     * @param  bool  $cached
      */
     public function __construct(
-        public readonly ?string $driver = null,
         public readonly string $ip,
+        public readonly ?string $driver = null,
         public readonly ?string $city = null,
         public readonly ?string $region = null,
         public readonly ?string $country = null,
@@ -34,18 +36,18 @@ class GeoipData
         #[CastToType('float')]
         public readonly ?float $longitude = null,
         public readonly bool $cached = true,
-    ) {
-    }
+    ) {}
 
     /**
-     * Create a new GeoipData instance.
+     * Create a new GeoipData instance from an array payload.
      *
-     * @return GeoipData A new instance of GeoipData.
+     * @param  array<string, mixed>  $payload
+     * @return \Reefki\Geoip\GeoipData
      */
-    public static function make()
+    public static function make(array $payload): GeoipData
     {
-        $mapper = new ObjectMapperUsingReflection();
+        $mapper = new ObjectMapperUsingReflection;
 
-        return $mapper->hydrateObject(static::class, ...func_get_args());
+        return $mapper->hydrateObject(static::class, $payload);
     }
 }
