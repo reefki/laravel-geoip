@@ -2,23 +2,67 @@
 
 namespace Reefki\Geoip\Driver;
 
-use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\Repository;
 use Reefki\Geoip\GeoipData;
 
 abstract class Driver
 {
     /**
+     * The cache repository instance.
+     *
+     * @var \Illuminate\Contracts\Cache\Repository
+     */
+    protected Repository $cache;
+
+    /**
+     * The cache TTL in seconds.
+     *
+     * @var int
+     */
+    protected int $cacheTtl;
+
+    /**
+     * The HTTP request timeout in seconds.
+     *
+     * @var int
+     */
+    protected int $timeout;
+
+    /**
+     * The number of times to retry failed requests.
+     *
+     * @var int
+     */
+    protected int $retry;
+
+    /**
+     * The driver configuration.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $config;
+
+    /**
      * Create a new driver instance.
      *
-     * @param  \Illuminate\Cache\Repository  $cache
-     * @param  int  $config
-     * @param  array<mixed>  $config
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  int  $cacheTtl
+     * @param  int  $timeout
+     * @param  int  $retry
+     * @param  array<string, mixed>  $config
      */
     public function __construct(
-        protected Repository $cache,
-        protected int $cacheTtl,
-        protected array $config = [],
+        Repository $cache,
+        int $cacheTtl,
+        int $timeout,
+        int $retry,
+        array $config = [],
     ) {
+        $this->cache = $cache;
+        $this->cacheTtl = $cacheTtl;
+        $this->timeout = $timeout;
+        $this->retry = $retry;
+        $this->config = $config;
     }
 
     /**
@@ -32,16 +76,19 @@ abstract class Driver
     {
         $driver = $this->getDriverName();
 
-        if (!$cache) {
+        if (! $cache) {
             $data = $this->lookup($ipAddress);
             $cached = false;
         } else {
+            $cacheKey = implode(':', ['geoip', static::class, $ipAddress]);
+            $cached = $this->cache->has($cacheKey);
+
+            /** @var array<string, mixed>|null $data */
             $data = $this->cache->remember(
-                key: implode(':', ['geoip', static::class, $ipAddress]),
+                key: $cacheKey,
                 ttl: $this->cacheTtl,
                 callback: fn () => $this->lookup($ipAddress)
             );
-            $cached = !is_null($data);
         }
 
         $defaults = [
@@ -64,7 +111,7 @@ abstract class Driver
     abstract public function lookup(string $ipAddress): ?array;
 
     /**
-     * Get driver name.
+     * Get the driver name.
      *
      * @return string
      */

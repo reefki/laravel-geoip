@@ -13,7 +13,7 @@ class GeoipServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/geoip.php', 'geoip');
 
@@ -25,16 +25,45 @@ class GeoipServiceProvider extends ServiceProvider
 
         $this->app->singleton(GeoipManager::class, fn ($app) => new GeoipManager($app));
 
-        Request::macro('anonymizedIp', function () {
-            /** @var \Illuminate\Http\Request $this */
-            return $this->ip() ? IpUtils::anonymize($this->ip()) : null;
-        });
+        Request::macro(
+            'anonymizedIp',
+            /**
+             * Get the anonymized IP address.
+             *
+             * @return string|null
+             */
+            function (): ?string {
+                /** @var Request $this */
+                $ip = $this->ip();
 
-        Request::macro('geoip', function (bool $anonymize = false, bool $cache = true) {
-            /** @var \Illuminate\Http\Request $this */
-            /** @phpstan-ignore-next-line */
-            $ipAddress = $anonymize ? $this->anonymizedIp() : $this->ip();
-            return app(GeoipManager::class)->get($ipAddress, $cache);
-        });
+                return $ip ? IpUtils::anonymize($ip) : null;
+            }
+        );
+
+        Request::macro(
+            'geoip',
+            /**
+             * Get the geoip information for the request's IP address.
+             *
+             * @param  bool  $anonymize
+             * @param  bool  $cache
+             * @return \Reefki\Geoip\GeoipData|null
+             */
+            function (bool $anonymize = false, bool $cache = true): ?GeoipData {
+                /** @var Request $request */
+                $request = $this;
+                $ip = $request->ip();
+
+                if ($ip === null) {
+                    return null;
+                }
+
+                if ($anonymize) {
+                    $ip = IpUtils::anonymize($ip);
+                }
+
+                return app(GeoipManager::class)->get($ip, $cache);
+            }
+        );
     }
 }
