@@ -2,11 +2,11 @@
 
 namespace Reefki\Geoip\Driver;
 
-use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Throwable;
 
 class GeojsDriver extends Driver
 {
@@ -49,7 +49,7 @@ class GeojsDriver extends Driver
                 callback: fn (PendingRequest $request, mixed $retryCount): PendingRequest => $request->retry(
                     (int) $retryCount,
                     100,
-                    fn (Exception $exception): bool => $exception instanceof ConnectionException,
+                    fn (Throwable $exception): bool => $exception instanceof ConnectionException,
                     false
                 )
             );
